@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeHub — Free Movies, Software, Apps & More</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📦%3C/text%3E%3C/svg%3E">
+  <meta name="description" content="One place for genuinely free content: public-domain movies, open-source software, freeware, and creative assets. With safety ratings and risk assessments.">
+  <style>
+    :root {
+      --bg: #0b0e1a;
+      --bg-2: #12162a;
+      --surface: #1a1f38;
+      --surface-2: #23294a;
+      --surface-3: #2c3358;
+      --text: #eef0f8;
+      --muted: #a2a8c8;
+      --muted-2: #7a80a8;
+      --accent: #6c8cff;
+      --accent-2: #46e0b0;
+      --warn: #ffb547;
+      --danger: #ff6b7a;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      --border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1100px 600px at 85% -10%, rgba(108,140,255,0.16), transparent 60%),
+        radial-gradient(900px 500px at 0% 0%, rgba(70,224,176,0.10), transparent 55%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; }
+
+    /* Header */
+    header.site {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(11,14,26,0.78);
+      border-bottom: 1px solid var(--border);
+    }
+    .site-inner {
+      max-width: 1280px; margin: 0 auto; padding: 12px 20px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; white-space: nowrap; }
+    .dot { width: 12px; height: 12px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 0 4px rgba(108,140,255,0.18); }
+    .search-wrap { flex: 1; max-width: 560px; position: relative; }
+    .search-wrap input {
+      width: 100%; padding: 10px 14px 10px 40px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 999px; color: var(--text); font-size: .95rem;
+      outline: none; transition: border-color .15s, background .15s;
+    }
+    .search-wrap input:focus { border-color: var(--accent); background: var(--surface-2); }
+    .search-wrap .si { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+    nav.topnav { display: flex; gap: 4px; }
+    nav.topnav a {
+      padding: 8px 12px; border-radius: 8px; color: var(--muted);
+      font-size: .9rem; transition: background .15s, color .15s;
+    }
+    nav.topnav a:hover, nav.topnav a.active { background: var(--surface); color: var(--text); }
+    .icon-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: .9rem;
+    }
+    @media (max-width: 760px) { nav.topnav { display: none; } .search-wrap { max-width: none; } }
+
+    /* Category bar (mega) */
+    .catbar {
+      max-width: 1280px; margin: 0 auto; padding: 0 20px 12px;
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .catpill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px; border-radius: 999px;
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--muted); font-size: .86rem; cursor: pointer;
+      transition: all .15s;
+    }
+    .catpill:hover { color: var(--text); border-color: var(--accent); }
+    .catpill.active { background: linear-gradient(135deg, var(--accent), #8aa2ff); color: #0b0e1c; border-color: transparent; font-weight: 600; }
+    .subcatbar { max-width: 1280px; margin: 0 auto; padding: 0 20px 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .subcat-label { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; margin-right: 4px; }
+    .subpill { padding: 5px 12px; border-radius: 999px; font-size: .78rem; background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; }
+    .subpill:hover { color: var(--text); border-color: var(--accent); }
+    .subpill.active { background: var(--accent-2); color: #0b0e1c; border-color: transparent; font-weight: 600; }
+
+    /* Layout */
+    .wrap { max-width: 1280px; margin: 0 auto; padding: 0 20px; }
+    .layout { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 20px 0 60px; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { display: none; } .sidebar.open { display: block; } }
+
+    /* Hero */
+    .hero { padding: 34px 0 20px; }
+    .hero h1 { font-size: clamp(1.8rem, 4vw, 2.9rem); line-height: 1.12; margin: 12px 0 10px; letter-spacing: -.02em; }
+    .hero h1 .grad { background: linear-gradient(100deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .hero p { color: var(--muted); max-width: 62ch; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--accent-2);
+      background: rgba(70,224,176,0.1); border: 1px solid rgba(70,224,176,0.3);
+      padding: 5px 12px; border-radius: 999px; }
+
+    /* Sidebar filters */
+    .sidebar { position: sticky; top: 90px; align-self: start; }
+    .filter-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+    .filter-card h3 { margin: 0 0 10px; font-size: .85rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-opt { display: flex; align-items: center; gap: 8px; font-size: .88rem; color: var(--muted); cursor: pointer; }
+    .filter-opt input { accent-color: var(--accent); }
+    .filter-opt:hover { color: var(--text); }
+    .filter-chiprow { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { padding: 4px 10px; border-radius: 999px; font-size: .78rem; background: var(--surface-2); border: 1px solid var(--border); color: var(--muted); cursor: pointer; }
+    .chip.active { background: var(--accent); color: #0b0e1c; border-color: transparent; font-weight: 600; }
+
+    /* Toolbar */
+    .toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 16px; flex-wrap: wrap; }
+    .toolbar .count { color: var(--muted); font-size: .9rem; }
+    .sort select { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 8px; }
+
+    /* Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+    .card {
+      background: linear-gradient(180deg, var(--surface), var(--surface-2));
+      border: 1px solid var(--border); border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+      transition: transform .15s, border-color .15s;
+      display: flex; flex-direction: column;
+    }
+    .card:hover { transform: translateY(-3px); border-color: rgba(108,140,255,0.35); }
+    .thumb {
+      aspect-ratio: 16/9; background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
+      display: grid; place-items: center; font-size: 2.2rem; position: relative; overflow: hidden;
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+    .thumb-icon { position: relative; z-index: 1; }
+    .thumb-placeholder { width:100%; height:100%; position:absolute; inset:0; display:grid; place-items:center; font-size:2.4rem; font-weight:700; color:rgba(255,255,255,0.85); text-shadow:0 2px 8px rgba(0,0,0,0.4); }
+    .thumb .typebadge {
+      position: absolute; top: 8px; left: 8px;
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(6px);
+      padding: 3px 8px; border-radius: 6px; font-size: .7rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em;
+    }
+    .card-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .card-title { font-weight: 600; font-size: .98rem; line-height: 1.3; }
+    .card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: .78rem; color: var(--muted); }
+    .badge-sm { padding: 2px 8px; border-radius: 6px; font-size: .72rem; font-weight: 600; }
+    .lic { background: rgba(70,224,176,0.12); color: var(--accent-2); }
+    .plat { background: rgba(108,140,255,0.12); color: var(--accent); }
+    .size { color: var(--muted-2); }
+    .stars { color: #ffc857; letter-spacing: 1px; font-size: .85rem; }
+    .stars .empty { color: var(--surface-3); }
+    .rating-num { color: var(--muted); font-size: .78rem; }
+    .risk-row { display: flex; align-items: center; gap: 6px; font-size: .78rem; }
+    .risk { font-weight: 600; }
+    .risk.ok { color: var(--accent-2); }
+    .risk.warn { color: var(--warn); }
+    .risk.bad { color: var(--danger); }
+    .risk.pending { color: var(--muted-2); }
+    .card-actions { display: flex; gap: 8px; margin-top: auto; }
+    .btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 8px; padding: 8px 12px; font-size: .82rem; font-weight: 600; cursor: pointer; transition: transform .12s, background .15s; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #8aa2ff); color: #0b0e1c; }
+    .btn-primary:hover { background: linear-gradient(135deg, #7d9bff, #9cb1ff); }
+    .btn-ghost { background: var(--surface-2); border-color: var(--border); color: var(--text); }
+    .btn-ghost:hover { background: var(--surface-3); }
+    .btn-sm { padding: 6px 10px; font-size: .78rem; }
+
+    /* Modal */
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; max-width: 760px; width: 100%; max-height: 90vh; overflow: auto; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+    .modal-head h2 { margin: 0; font-size: 1.2rem; }
+    .modal-body { padding: 22px; display: grid; gap: 18px; }
+    .modal-thumb { aspect-ratio: 16/9; border-radius: 12px; background: linear-gradient(135deg, var(--surface-2), var(--surface-3)); display: grid; place-items: center; font-size: 3rem; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+    .detail-block { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .detail-block h4 { margin: 0 0 8px; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    .safety-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: .86rem; }
+    .safety-list li { display: flex; justify-content: space-between; gap: 8px; }
+    .safety-list .k { color: var(--muted); }
+    .download-section { background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .download-section h4 { margin: 0 0 10px; }
+    .checksum { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; color: var(--muted); word-break: break-all; background: var(--bg-2); padding: 8px; border-radius: 6px; margin-top: 8px; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface-3); color: var(--text); padding: 10px 18px; border-radius: 999px; border: 1px solid var(--border); font-size: .88rem; z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .toast.show { opacity: 1; }
+
+    footer.site { border-top: 1px solid var(--border); color: var(--muted); font-size: .85rem; padding: 30px 0 40px; margin-top: 20px; }
+    .empty { text-align: center; color: var(--muted); padding: 60px 20px; }
+  </style>
+</head>
+<body>
+
+<header class="site">
+  <div class="site-inner">
+    <div class="brand"><span class="dot"></span> FreeHub</div>
+    <div class="search-wrap">
+      <span class="si">🔍</span>
+      <input id="search" type="search" placeholder="Search free movies, software, apps, games…" autocomplete="off">
+    </div>
+    <nav class="topnav">
+      <a href="#" class="active" data-cat="all">All</a>
+      <a href="#" data-cat="movies">Movies</a>
+      <a href="#" data-cat="software">Software</a>
+      <a href="#" data-cat="apps">Apps</a>
+      <a href="#" data-cat="games">Games</a>
+    </nav>
+    <button class="icon-btn" id="submitOpen">+ Submit</button>
+    <button class="icon-btn" id="authOpen">Sign in</button>
+    <button class="icon-btn" id="filterToggle">Filters</button>
+  </div>
+</header>
+
+<div class="catbar" id="catbar"></div>
+<div class="subcatbar" id="subcatbar" style="display:none;"></div>
+
+<main class="wrap">
+  <div id="demoBanner" style="display:none; background:rgba(255,181,71,0.12); border:1px solid rgba(255,181,71,0.3); color:var(--warn); padding:8px 20px; text-align:center; font-size:.85rem;">
+    Demo mode — showing built-in sample data. Live catalog requires the API server.
+  </div>
+  <section class="hero">
+    <span class="badge">● Only genuinely free content</span>
+    <h1>Find <span class="grad">free movies, software, apps & more</span> — in one place.</h1>
+    <p>Public-domain films, open-source software, freeware and creative assets. Every item shows a star rating and a risk assessment before you download.</p>
+  </section>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="filter-card">
+        <h3>License</h3>
+        <div class="filter-group" id="f-license"></div>
+      </div>
+      <div class="filter-card">
+        <h3>Safety</h3>
+        <div class="filter-group" id="f-safety"></div>
+      </div>
+      <div class="filter-card">
+        <h3>Platform</h3>
+        <div class="filter-group" id="f-platform"></div>
+      </div>
+      <div class="filter-card">
+        <h3>Rating</h3>
+        <div class="filter-group" id="f-rating"></div>
+      </div>
+    </aside>
+
+    <section>
+      <div class="toolbar">
+        <div class="count" id="countLabel">Loading…</div>
+        <div class="sort">
+          <select id="sort">
+            <option value="newest">Newest</option>
+            <option value="rating">Top rated</option>
+            <option value="downloads">Most downloaded</option>
+            <option value="name">Name A–Z</option>
+            <option value="size-asc">Size (small first)</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" style="display:none;">No items match your filters. Try clearing some.</div>
+    </section>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap">
+    FreeHub aggregates only genuinely free content. Downloads link to original publishers unless redistribution is explicitly permitted. VirusTotal scans are best-effort; always verify checksums. © <span id="year"></span> FreeHub.
+  </div>
+</footer>
+
+<!-- Auth modal -->
+<div class="modal-backdrop" id="authModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-head">
+      <h2 id="authTitle">Sign in</h2>
+      <button class="btn btn-ghost btn-sm" id="authClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <button class="btn btn-ghost btn-sm" id="tabLogin">Sign in</button>
+        <button class="btn btn-ghost btn-sm" id="tabRegister">Create account</button>
+      </div>
+      <input id="authEmail" type="email" placeholder="Email" style="width:100%; padding:10px; margin-bottom:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);">
+      <input id="authPassword" type="password" placeholder="Password" style="width:100%; padding:10px; margin-bottom:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);">
+      <input id="authName" type="text" placeholder="Display name (optional)" style="width:100%; padding:10px; margin-bottom:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text); display:none;">
+      <button class="btn btn-primary" id="authSubmit" style="width:100%;">Sign in</button>
+      <p id="authMsg" style="color:var(--muted); font-size:.85rem; margin-top:10px;"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Submit content modal -->
+<div class="modal-backdrop" id="submitModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-head">
+      <h2>Submit free content</h2>
+      <button class="btn btn-ghost btn-sm" id="submitClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <input id="subTitle" placeholder="Title" style="width:100%; padding:10px; margin-bottom:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);">
+      <input id="subUrl" placeholder="Download / source URL" style="width:100%; padding:10px; margin-bottom:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);">
+      <select id="subType" style="width:100%; padding:10px; margin-bottom:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);">
+        <option value="software">Software</option><option value="movie">Movie</option><option value="app">App</option><option value="game">Game</option><option value="book">Book</option><option value="music">Music</option><option value="asset">Asset</option>
+      </select>
+      <input id="subLicense" placeholder="License (e.g. MIT, Public Domain, CC-BY)" style="width:100%; padding:10px; margin-bottom:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);">
+      <textarea id="subDesc" placeholder="Description" rows="3" style="width:100%; padding:10px; margin-bottom:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; color:var(--text);"></textarea>
+      <button class="btn btn-primary" id="submitBtn" style="width:100%;">Submit for review</button>
+      <p id="submitMsg" style="color:var(--muted); font-size:.85rem; margin-top:10px;"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Detail modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="m-title">Title</h2>
+      <button class="btn btn-ghost btn-sm" id="m-close">✕ Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-thumb" id="m-thumb">🎬</div>
+      <p id="m-desc" style="color:var(--muted); margin:0;"></p>
+      <div class="detail-grid">
+        <div class="detail-block">
+          <h4>Details</h4>
+          <ul class="safety-list">
+            <li><span class="k">Type</span><span id="m-type"></span></li>
+            <li><span class="k">License</span><span id="m-license"></span></li>
+            <li><span class="k">Platform</span><span id="m-platform"></span></li>
+            <li><span class="k">Size</span><span id="m-size"></span></li>
+            <li><span class="k">Version</span><span id="m-version"></span></li>
+            <li><span class="k">Updated</span><span id="m-updated"></span></li>
+            <li><span class="k">Source</span><span id="m-source"></span></li>
+          </ul>
+        </div>
+        <div class="detail-block">
+          <h4>Safety &amp; Risk</h4>
+          <ul class="safety-list">
+            <li><span class="k">Overall</span><span id="m-risk"></span></li>
+            <li><span class="k">VirusTotal</span><span id="m-vt"></span></li>
+            <li><span class="k">Code signed</span><span id="m-signed"></span></li>
+            <li><span class="k">License clear</span><span id="m-licclear"></span></li>
+            <li><span class="k">Last scanned</span><span id="m-scanned"></span></li>
+            <li><span class="k">User reports</span><span id="m-reports"></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="detail-block">
+        <h4>Rating</h4>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="stars" id="m-stars" style="font-size:1.3rem;"></span>
+          <span id="m-ratingtext" style="color:var(--muted);"></span>
+        </div>
+      </div>
+      <div class="download-section">
+        <h4>Download</h4>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <a class="btn btn-primary" id="m-direct" href="#" target="_blank" rel="noopener">⬇ Direct download</a>
+          <button class="btn btn-ghost" id="m-fdm">📋 Copy link for Free Download Manager</button>
+          <button class="btn btn-ghost" id="m-checksum">SHA-256</button>
+        </div>
+        <div class="checksum" id="m-hash" style="display:none;"></div>
+        <p style="color:var(--muted-2); font-size:.78rem; margin:10px 0 0;">
+          FDM is a desktop client — install it from freedownloadmanager.org, then paste the copied link. Direct links point to the original publisher.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- Data ---------------- */
+const CATEGORIES = [
+  { id:'all', label:'All', icon:'🌐' },
+  { id:'movies', label:'Movies', icon:'🎬' },
+  { id:'software', label:'Software', icon:'📦' },
+  { id:'apps', label:'Apps', icon:'📱' },
+  { id:'games', label:'Games', icon:'🎮' },
+  { id:'books', label:'Books', icon:'📚' },
+  { id:'music', label:'Music', icon:'🎵' },
+  { id:'assets', label:'Assets', icon:'🎨' },
+];
+
+const LICENSES = ['Public Domain','CC0','CC-BY','MIT/GPL (OSS)','Freeware','Free w/ ads','Freemium'];
+const PLATFORMS = ['Windows','macOS','Linux','Android','iOS','Web','Cross-platform'];
+const SAFETY = ['verified','caution','flagged','pending'];
+
+const MOVIE_GENRES = ['All','Drama','Comedy','Horror','Sci-Fi','Action','Thriller','Romance','Documentary','Animation','Western','Noir','Fantasy'];
+const MOVIE_ERAS = ['All','Silent (pre-1929)','Classic (30s-60s)','Retro (70s-90s)','Modern (2000s+)'];
+const GAME_GENRES = ['All','Action','Adventure','RPG','Strategy','Simulation','Puzzle','Racing','Sports','Horror','Indie','Casual'];
+
+let ITEMS = [
+  { id:1, title:'Night of the Living Dead', type:'movie', cat:'movies', icon:'🧟', license:'Public Domain', platform:'Web', size:'1.2 GB', version:'—', updated:'2024-10-01', source:'archive.org', rating:4.6, reviews:1240, downloads:88200, risk:'verified', vt:'0/72 clean', signed:'n/a (film)', licclear:'Yes', scanned:'2024-10-02', reports:0, desc:'George A. Romero classic, public domain. Restored HD version.', tags:['Horror','Classic (30s-60s)'], hash:'a3f5c9e2b1d47f0e8a9b2c3d4e5f60718293a4b5c6d7e8f90123456789abcde', url:'https://archive.org/details/night_of_the_living_dead' },
+  { id:2, title:'VLC Media Player', type:'software', cat:'software', icon:'▶️', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'42 MB', version:'3.0.21', updated:'2024-09-15', source:'videolan.org', rating:4.8, reviews:9800, downloads:2400000, risk:'verified', vt:'0/72 clean', signed:'Yes (VideoLAN)', licclear:'Yes', scanned:'2024-09-16', reports:0, desc:'Free, open-source, cross-platform multimedia player and framework.', hash:'b4e6d0f3c2e5801f9b0c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0', url:'https://www.videolan.org/vlc/' },
+  { id:3, title:'LibreOffice', type:'software', cat:'software', icon:'📄', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'320 MB', version:'24.8.2', updated:'2024-09-20', source:'libreoffice.org', rating:4.5, reviews:6200, downloads:1800000, risk:'verified', vt:'0/72 clean', signed:'Yes (TDF)', licclear:'Yes', scanned:'2024-09-21', reports:0, desc:'Full office suite: Writer, Calc, Impress, Draw, Base, Math.', hash:'c5f7e104d3f69120ac1d4e5f60718293a4b5c6d7e8f90123456789abcdef01', url:'https://www.libreoffice.org/download/' },
+  { id:4, title:'F-Droid', type:'app', cat:'apps', icon:'🤖', license:'MIT/GPL (OSS)', platform:'Android', size:'8 MB', version:'1.20.0', updated:'2024-09-10', source:'f-droid.org', rating:4.7, reviews:4100, downloads:950000, risk:'verified', vt:'0/72 clean', signed:'Yes (F-Droid)', licclear:'Yes', scanned:'2024-09-11', reports:0, desc:'Installable catalogue of FOSS applications for Android.', hash:'d608f215e407a231bd2e5f60718293a4b5c6d7e8f90123456789abcdef012', url:'https://f-droid.org/' },
+  { id:5, title:'Blender', type:'software', cat:'software', icon:'🧊', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'280 MB', version:'4.2.2', updated:'2024-09-25', source:'blender.org', rating:4.9, reviews:15200, downloads:3100000, risk:'verified', vt:'0/72 clean', signed:'Yes (Blender Foundation)', licclear:'Yes', scanned:'2024-09-26', reports:0, desc:'Free and open-source 3D creation suite.', hash:'e7190326f518b342ce3f60718293a4b5c6d7e8f90123456789abcdef0123', url:'https://www.blender.org/download/' },
+  { id:6, title:'SuperTuxKart', type:'game', cat:'games', icon:'🏎️', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'620 MB', version:'1.4', updated:'2024-08-30', source:'supertuxkart.net', rating:4.4, reviews:3200, downloads:420000, risk:'verified', vt:'0/72 clean', signed:'Yes', licclear:'Yes', scanned:'2024-09-01', reports:0, desc:'Free kart racing game with mascots and tracks.', tags:['Racing','Indie'], hash:'f82a14370629c453df40718293a4b5c6d7e8f90123456789abcdef01234', url:'https://supertuxkart.net/Download' },
+  { id:7, title:'Audacity', type:'software', cat:'software', icon:'🎧', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'34 MB', version:'3.6.4', updated:'2024-09-18', source:'audacityteam.org', rating:4.6, reviews:7100, downloads:2200000, risk:'verified', vt:'0/72 clean', signed:'Yes (Muse Group)', licclear:'Yes', scanned:'2024-09-19', reports:0, desc:'Free, open-source, cross-platform audio editor.', hash:'093b2548173ad564e0518293a4b5c6d7e8f90123456789abcdef012345', url:'https://www.audacityteam.org/download/' },
+  { id:8, title:'GIMP', type:'software', cat:'software', icon:'🖌️', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'290 MB', version:'2.10.38', updated:'2024-07-15', source:'gimp.org', rating:4.3, reviews:5400, downloads:1600000, risk:'verified', vt:'0/72 clean', signed:'Yes', licclear:'Yes', scanned:'2024-07-16', reports:0, desc:'GNU Image Manipulation Program — free raster graphics editor.', hash:'1a4c3659284be675f16293a4b5c6d7e8f90123456789abcdef0123456', url:'https://www.gimp.org/downloads/' },
+  { id:9, title:'Calibre', type:'software', cat:'software', icon:'📖', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'130 MB', version:'7.19', updated:'2024-09-22', source:'calibre-ebook.com', rating:4.7, reviews:4800, downloads:900000, risk:'verified', vt:'0/72 clean', signed:'Yes (Kovid Goyal)', licclear:'Yes', scanned:'2024-09-23', reports:0, desc:'E-book manager, viewer, converter and library.', hash:'2b5d476a395cf7860273a4b5c6d7e8f90123456789abcdef01234567', url:'https://calibre-ebook.com/download' },
+  { id:10, title:'Project Gutenberg eBook', type:'book', cat:'books', icon:'📕', license:'Public Domain', platform:'Web', size:'2 MB', version:'—', updated:'2024-01-01', source:'gutenberg.org', rating:4.2, reviews:890, downloads:340000, risk:'verified', vt:'n/a', signed:'n/a', licclear:'Yes', scanned:'2024-01-02', reports:0, desc:'Classic literature in EPUB/PDF/MOBI, free to download.', hash:'3c6e587b4a6d08971384b5c6d7e8f90123456789abcdef012345678', url:'https://www.gutenberg.org/' },
+  { id:11, title:'Inkscape', type:'software', cat:'software', icon:'✒️', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'110 MB', version:'1.3.2', updated:'2024-08-12', source:'inkscape.org', rating:4.5, reviews:3900, downloads:720000, risk:'verified', vt:'0/72 clean', signed:'Yes', licclear:'Yes', scanned:'2024-08-13', reports:0, desc:'Professional vector graphics editor.', hash:'4d7f698c5b7e19a82495c6d7e8f90123456789abcdef0123456789', url:'https://inkscape.org/release/' },
+  { id:12, title:'OBS Studio', type:'software', cat:'software', icon:'🎥', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'120 MB', version:'30.2.3', updated:'2024-09-28', source:'obsproject.com', rating:4.8, reviews:11200, downloads:2900000, risk:'verified', vt:'0/72 clean', signed:'Yes (OBS Project)', licclear:'Yes', scanned:'2024-09-29', reports:0, desc:'Free software for video recording and live streaming.', hash:'5e807a9d6c8f2ab935a6d7e8f90123456789abcdef0123456789a', url:'https://obsproject.com/download' },
+  { id:13, title:'Kdenlive', type:'software', cat:'software', icon:'🎞️', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'100 MB', version:'24.08.2', updated:'2024-09-12', source:'kdenlive.org', rating:4.4, reviews:2700, downloads:560000, risk:'verified', vt:'0/72 clean', signed:'Yes', licclear:'Yes', scanned:'2024-09-13', reports:0, desc:'Free and open-source video editor.', hash:'6f918bad7d903bc046b7e8f90123456789abcdef0123456789ab', url:'https://kdenlive.org/en/download/' },
+  { id:14, title:'7-Zip', type:'software', cat:'software', icon:'🗜️', license:'MIT/GPL (OSS)', platform:'Windows', size:'1.5 MB', version:'24.08', updated:'2024-08-20', source:'7-zip.org', rating:4.7, reviews:8900, downloads:4100000, risk:'verified', vt:'0/72 clean', signed:'Yes (Igor Pavlov)', licclear:'Yes', scanned:'2024-08-21', reports:0, desc:'High compression ratio file archiver.', hash:'70a29cbe8ea14cd157c8f90123456789abcdef0123456789abc', url:'https://www.7-zip.org/download.html' },
+  { id:15, title:'PortableApps Suite', type:'software', cat:'software', icon:'🧳', license:'Freeware', platform:'Windows', size:'300 MB', version:'28.0', updated:'2024-09-05', source:'portableapps.com', rating:4.3, reviews:2100, downloads:680000, risk:'caution', vt:'0/72 clean', signed:'Yes (PortableApps.com)', licclear:'Partial', scanned:'2024-09-06', reports:2, desc:'Collection of portable apps; freeware but check individual licenses.', hash:'81b3adcf9fb25de268d90123456789abcdef0123456789abcd', url:'https://portableapps.com/download' },
+  { id:16, title:'HandBrake', type:'software', cat:'software', icon:'🎬', license:'MIT/GPL (OSS)', platform:'Cross-platform', size:'22 MB', version:'1.8.2', updated:'2024-09-05', source:'handbrake.fr', rating:4.7, reviews:5800, downloads:1900000, risk:'verified', vt:'0/72 clean', signed:'Yes (HandBrake Team)', licclear:'Yes', scanned:'2024-09-06', reports:0, desc:'Free, open-source video transcoder.', hash:'92c4bed0a0c36ef379ea123456789abcdef0123456789abcde', url:'https://handbrake.fr/downloads.php' },
+  { id:17, title:'Jamendo Track Pack', type:'music', cat:'music', icon:'🎶', license:'CC-BY', platform:'Web', size:'45 MB', version:'—', updated:'2024-06-10', source:'jamendo.com', rating:4.1, reviews:640, downloads:120000, risk:'verified', vt:'n/a', signed:'n/a', licclear:'Yes', scanned:'2024-06-11', reports:0, desc:'Royalty-free music tracks for personal/commercial use per CC-BY.', hash:'a3d5cf01b1d47f0e8a9b2c3d4e5f60718293a4b5c6d7e8f90123456789abcde', url:'https://www.jamendo.com/' },
+  { id:18, title:'Google Fonts Pack', type:'asset', cat:'assets', icon:'🔤', license:'OFL (OSS)', platform:'Web', size:'12 MB', version:'—', updated:'2024-09-30', source:'fonts.google.com', rating:4.9, reviews:1200, downloads:890000, risk:'verified', vt:'0/72 clean', signed:'n/a', licclear:'Yes', scanned:'2024-10-01', reports:0, desc:'Open-source font families free for commercial use.', hash:'b4e6d0f2c2e5801f9b0c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0', url:'https://fonts.google.com/' },
+  { id:19, title:'Suspicious "Free PDF Editor"', type:'software', cat:'software', icon:'⚠️', license:'Freeware', platform:'Windows', size:'18 MB', version:'1.0', updated:'2024-09-29', source:'unknown-mirror.example', rating:2.1, reviews:340, downloads:9800, risk:'flagged', vt:'8/72 (trojan)', signed:'No', licclear:'No', scanned:'2024-09-30', reports:27, desc:'Flagged by VirusTotal and user reports. Do not install.', hash:'c5f7e103d3f69120ac1d4e5f60718293a4b5c6d7e8f90123456789abcdef01', url:'#' },
+  { id:20, title:'Internet Archive Feature Film', type:'movie', cat:'movies', icon:'🎞️', license:'Public Domain', platform:'Web', size:'800 MB', version:'—', updated:'2024-05-01', source:'archive.org', rating:4.0, reviews:560, downloads:210000, risk:'verified', vt:'n/a', signed:'n/a', licclear:'Yes', scanned:'2024-05-02', reports:0, desc:'Public-domain feature film from the Internet Archive collection.', tags:['Drama','Modern (2000s+)'], hash:'d608f214e407a231bd2e5f60718293a4b5c6d7e8f90123456789abcdef012', url:'https://archive.org/details/movies' },
+  { id:21, title:'Unverified Freeware Tool', type:'software', cat:'software', icon:'❓', license:'Freeware', platform:'Windows', size:'5 MB', version:'2.1', updated:'2024-09-27', source:'community-mirror.example', rating:3.0, reviews:45, downloads:3200, risk:'pending', vt:'Not scanned', signed:'Unknown', licclear:'Partial', scanned:'Never', reports:1, desc:'Not yet scanned. Treat with caution until verified.', hash:'e7190325f518b342ce3f60718293a4b5c6d7e8f90123456789abcdef0123', url:'#' },
+  { id:22, title:'Standard Ebooks Title', type:'book', cat:'books', icon:'📕', license:'Public Domain', platform:'Web', size:'1 MB', version:'—', updated:'2024-08-01', source:'standardebooks.org', rating:4.6, reviews:320, downloads:88000, risk:'verified', vt:'n/a', signed:'n/a', licclear:'Yes', scanned:'2024-08-02', reports:0, desc:'Carefully formatted public-domain ebook.', hash:'f82a14360629c453df40718293a4b5c6d7e8f90123456789abcdef01234', url:'https://standardebooks.org/' },
+  { id:23, title:'itch.io Free Game', type:'game', cat:'games', icon:'🎮', license:'Freeware', platform:'Web', size:'50 MB', version:'1.0', updated:'2024-09-14', source:'itch.io', rating:4.2, reviews:780, downloads:150000, risk:'verified', vt:'0/72 clean', signed:'n/a', licclear:'Yes', scanned:'2024-09-15', reports:0, desc:'Free indie game hosted on itch.io (link out).', tags:['Indie'], hash:'093b2547173ad564e0518293a4b5c6d7e8f90123456789abcdef012345', url:'https://itch.io/games/free' },
+  { id:24, title:'Free Music Archive Track', type:'music', cat:'music', icon:'🎵', license:'CC-BY', platform:'Web', size:'6 MB', version:'—', updated:'2024-07-20', source:'freemusicarchive.org', rating:4.0, reviews:210, downloads:64000, risk:'verified', vt:'n/a', signed:'n/a', licclear:'Yes', scanned:'2024-07-21', reports:0, desc:'CC-licensed music track free to use with attribution.', hash:'1a4c3658284be675f16293a4b5c6d7e8f90123456789abcdef0123456', url:'https://freemusicarchive.org/' },
+];
+
+/* ---------------- State ---------------- */
+const state = {
+  cat: 'all',
+  search: '',
+  license: new Set(),
+  safety: new Set(),
+  platform: new Set(),
+  rating: 0,
+  sort: 'newest',
+  movieGenre: 'All',
+  movieEra: 'All',
+  gameGenre: 'All',
+};
+
+/* ---------------- Helpers ---------------- */
+function stars(n) {
+  const full = Math.floor(n);
+  const half = n - full >= 0.5;
+  let s = '';
+  for (let i=0;i<5;i++){
+    if (i < full) s += '★';
+    else if (i === full && half) s += '★';
+    else s += '☆';
+  }
+  return s;
+}
+function riskInfo(r) {
+  if (r === 'verified') return { cls:'ok', label:'✅ Verified' };
+  if (r === 'caution') return { cls:'warn', label:'⚠️ Caution' };
+  if (r === 'flagged') return { cls:'bad', label:'❌ Flagged' };
+  return { cls:'pending', label:'⏳ Pending' };
+}
+function fmtNum(n){ return n >= 1000 ? (n/1000).toFixed(1)+'k' : n; }
+
+/* ---------------- Render category bar ---------------- */
+const catbar = document.getElementById('catbar');
+CATEGORIES.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'catpill' + (c.id === 'all' ? ' active' : '');
+  b.dataset.cat = c.id;
+  b.innerHTML = `${c.icon} ${c.label}`;
+  b.onclick = () => { state.cat = c.id; document.querySelectorAll('.catpill').forEach(x=>x.classList.remove('active')); b.classList.add('active'); document.querySelectorAll('nav.topnav a').forEach(x=>x.classList.toggle('active', x.dataset.cat===c.id)); renderSubcatbar(); render(); };
+  catbar.appendChild(b);
+});
+document.querySelectorAll('nav.topnav a').forEach(a => {
+  a.onclick = (e) => { e.preventDefault(); state.cat = a.dataset.cat; document.querySelectorAll('nav.topnav a').forEach(x=>x.classList.remove('active')); a.classList.add('active'); document.querySelectorAll('.catpill').forEach(x=>x.classList.toggle('active', x.dataset.cat===state.cat)); renderSubcatbar(); render(); };
+});
+
+/* ---------------- Filters ---------------- */
+function buildFilter(containerId, values, stateSet, onChange) {
+  const c = document.getElementById(containerId);
+  values.forEach(v => {
+    const lbl = document.createElement('label');
+    lbl.className = 'filter-opt';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.value = v;
+    cb.onchange = () => { if (cb.checked) stateSet.add(v); else stateSet.delete(v); onChange(); };
+    lbl.appendChild(cb);
+    lbl.appendChild(document.createTextNode(' ' + v));
+    c.appendChild(lbl);
+  });
+}
+buildFilter('f-license', LICENSES, state.license, render);
+buildFilter('f-platform', PLATFORMS, state.platform, render);
+// safety
+const safetyLabels = { verified:'✅ Verified', caution:'⚠️ Caution', flagged:'❌ Flagged', pending:'⏳ Pending' };
+const sc = document.getElementById('f-safety');
+SAFETY.forEach(v => {
+  const lbl = document.createElement('label');
+  lbl.className = 'filter-opt';
+  const cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.value = v;
+  cb.onchange = () => { if (cb.checked) state.safety.add(v); else state.safety.delete(v); render(); };
+  lbl.appendChild(cb);
+  lbl.appendChild(document.createTextNode(' ' + safetyLabels[v]));
+  sc.appendChild(lbl);
+});
+// rating
+const rc = document.getElementById('f-rating');
+[4,3,2].forEach(r => {
+  const lbl = document.createElement('label');
+  lbl.className = 'filter-opt';
+  const rb = document.createElement('input');
+  rb.type = 'radio'; rb.name = 'rating'; rb.value = r;
+  rb.onchange = () => { state.rating = r; render(); };
+  lbl.appendChild(rb);
+  lbl.appendChild(document.createTextNode(` ${r}★ & up`));
+  rc.appendChild(lbl);
+});
+const anyR = document.createElement('label');
+anyR.className = 'filter-opt';
+const rb0 = document.createElement('input'); rb0.type='radio'; rb0.name='rating'; rb0.value=0; rb0.checked=true;
+rb0.onchange = () => { state.rating = 0; render(); };
+anyR.appendChild(rb0); anyR.appendChild(document.createTextNode(' Any rating'));
+rc.appendChild(anyR);
+
+/* ---------------- Filtering ---------------- */
+function filtered() {
+  const q = state.search.toLowerCase().trim();
+  let out = ITEMS.filter(it => {
+    if (state.cat !== 'all' && it.cat !== state.cat) return false;
+    if (q && !(it.title.toLowerCase().includes(q) || it.desc.toLowerCase().includes(q) || it.type.includes(q))) return false;
+    if (state.license.size && !state.license.has(it.license)) return false;
+    if (state.safety.size && !state.safety.has(it.risk)) return false;
+    if (state.platform.size && !state.platform.has(it.platform)) return false;
+    if (state.rating && it.rating < state.rating) return false;
+    if (state.cat === 'movies') {
+      const tags = it.tags || [];
+      if (state.movieGenre && state.movieGenre !== 'All' && !tags.includes(state.movieGenre)) return false;
+      if (state.movieEra && state.movieEra !== 'All' && !tags.includes(state.movieEra)) return false;
+    }
+    if (state.cat === 'games') {
+      const tags = it.tags || [];
+      if (state.gameGenre && state.gameGenre !== 'All' && !tags.includes(state.gameGenre)) return false;
+    }
+    return true;
+  });
+  // sort
+  const s = state.sort;
+  out.sort((a,b) => {
+    if (s === 'rating') return b.rating - a.rating;
+    if (s === 'downloads') return b.downloads - a.downloads;
+    if (s === 'name') return a.title.localeCompare(b.title);
+    if (s === 'size-asc') return parseFloat(a.size) - parseFloat(b.size);
+    return b.id - a.id; // newest
+  });
+  return out;
+}
+
+/* ---------------- Movie subcategories ---------------- */
+const subcatbar = document.getElementById('subcatbar');
+function renderSubcatbar() {
+  if (state.cat !== 'movies' && state.cat !== 'games') { subcatbar.style.display = 'none'; subcatbar.innerHTML = ''; return; }
+  subcatbar.style.display = 'flex';
+  subcatbar.innerHTML = '';
+  if (state.cat === 'movies') {
+    const gl = document.createElement('span'); gl.className = 'subcat-label'; gl.textContent = 'Genre'; subcatbar.appendChild(gl);
+    MOVIE_GENRES.forEach(g => {
+      const b = document.createElement('button');
+      b.className = 'subpill' + (state.movieGenre === g ? ' active' : '');
+      b.textContent = g;
+      b.onclick = () => { state.movieGenre = g; renderSubcatbar(); render(); };
+      subcatbar.appendChild(b);
+    });
+    const el = document.createElement('span'); el.className = 'subcat-label'; el.style.marginLeft = '12px'; el.textContent = 'Era'; subcatbar.appendChild(el);
+    MOVIE_ERAS.forEach(e => {
+      const b = document.createElement('button');
+      b.className = 'subpill' + (state.movieEra === e ? ' active' : '');
+      b.textContent = e;
+      b.onclick = () => { state.movieEra = e; renderSubcatbar(); render(); };
+      subcatbar.appendChild(b);
+    });
+  } else {
+    const gl = document.createElement('span'); gl.className = 'subcat-label'; gl.textContent = 'Genre'; subcatbar.appendChild(gl);
+    GAME_GENRES.forEach(g => {
+      const b = document.createElement('button');
+      b.className = 'subpill' + (state.gameGenre === g ? ' active' : '');
+      b.textContent = g;
+      b.onclick = () => { state.gameGenre = g; renderSubcatbar(); render(); };
+      subcatbar.appendChild(b);
+    });
+  }
+}
+
+/* ---------------- Render grid ---------------- */
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const countLabel = document.getElementById('countLabel');
+
+function render() {
+  const list = filtered();
+  grid.innerHTML = '';
+  countLabel.textContent = `${list.length} item${list.length!==1?'s':''} found`;
+  empty.style.display = list.length ? 'none' : 'block';
+  list.forEach(it => {
+    const r = riskInfo(it.risk);
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.innerHTML = `
+      <div class="thumb">${thumbInner(it)}<span class="typebadge">${it.type}</span></div>
+      <div class="card-body">
+        <div class="card-title">${escapeHtml(it.title)}</div>
+        <div class="card-meta">
+          <span class="badge-sm lic">${it.license}</span>
+          <span class="badge-sm plat">${it.platform}</span>
+          <span class="size">${it.size}</span>
+        </div>
+        <div class="stars" title="${it.rating}">${stars(it.rating)} <span class="rating-num">${it.rating} (${fmtNum(it.reviews)})</span></div>
+        <div class="risk-row"><span class="risk ${r.cls}">${r.label}</span><span style="color:var(--muted-2);font-size:.75rem;">· ${it.vt}</span></div>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-sm" data-open="${it.id}">View</button>
+          <button class="btn btn-ghost btn-sm" data-dl="${it.id}">⬇ Download</button>
+        </div>
+      </div>`;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openModal(+b.dataset.open));
+  grid.querySelectorAll('[data-dl]').forEach(b => b.onclick = () => quickDownload(+b.dataset.dl));
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function hueFor(s) {
+  let h = 0;
+  for (let i = 0; i < String(s).length; i++) h = (h * 31 + String(s).charCodeAt(i)) >>> 0;
+  return h % 360;
+}
+function thumbInner(it) {
+  if (it.thumbnail) {
+    return `<img src="${escapeHtml(it.thumbnail)}" alt="" loading="lazy" onerror="this.outerHTML='<div class=\\'thumb-placeholder\\' style=\\'background:linear-gradient(135deg,hsl(${hueFor(it.title)},70%,45%),hsl(${(hueFor(it.title)+40)%360},70%,30%))\\'>${escapeHtml((it.title||'?').charAt(0).toUpperCase())}</div>'">`;
+  }
+  const h = hueFor(it.title);
+  return `<div class="thumb-placeholder" style="background:linear-gradient(135deg,hsl(${h},70%,45%),hsl(${(h+40)%360},70%,30%))">${escapeHtml((it.title || it.icon || '?').charAt(0).toUpperCase())}</div>`;
+}
+
+/* ---------------- Modal ---------------- */
+const modal = document.getElementById('modal');
+let current = null;
+function openModal(id) {
+  current = ITEMS.find(x => x.id === id);
+  if (!current) return;
+  const it = current;
+  const r = riskInfo(it.risk);
+  document.getElementById('m-title').textContent = it.title;
+  const mt = document.getElementById('m-thumb');
+  mt.innerHTML = thumbInner(it);
+  document.getElementById('m-desc').textContent = it.desc;
+  document.getElementById('m-type').textContent = it.type;
+  document.getElementById('m-license').textContent = it.license;
+  document.getElementById('m-platform').textContent = it.platform;
+  document.getElementById('m-size').textContent = it.size;
+  document.getElementById('m-version').textContent = it.version;
+  document.getElementById('m-updated').textContent = it.updated;
+  document.getElementById('m-source').textContent = it.source;
+  document.getElementById('m-risk').innerHTML = `<span class="risk ${r.cls}">${r.label}</span>`;
+  document.getElementById('m-vt').textContent = it.vt;
+  document.getElementById('m-signed').textContent = it.signed;
+  document.getElementById('m-licclear').textContent = it.licclear;
+  document.getElementById('m-scanned').textContent = it.scanned;
+  document.getElementById('m-reports').textContent = it.reports;
+  document.getElementById('m-stars').textContent = stars(it.rating);
+  document.getElementById('m-stars').className = 'stars';
+  document.getElementById('m-ratingtext').textContent = `${it.rating} / 5 · ${fmtNum(it.reviews)} reviews · ${fmtNum(it.downloads)} downloads`;
+  const direct = document.getElementById('m-direct');
+  direct.href = it.url;
+  document.getElementById('m-hash').textContent = it.hash;
+  document.getElementById('m-hash').style.display = 'none';
+  modal.classList.add('open');
+}
+document.getElementById('m-close').onclick = () => modal.classList.remove('open');
+modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+
+document.getElementById('m-fdm').onclick = () => {
+  if (!current) return;
+  const url = current.url;
+  navigator.clipboard.writeText(url).then(() => toast('Link copied — paste into Free Download Manager')).catch(() => toast('Copy failed: ' + url));
+  // attempt protocol handler
+  try { window.location.href = 'fdm://download?url=' + encodeURIComponent(url); } catch(e){}
+};
+document.getElementById('m-checksum').onclick = () => {
+  const h = document.getElementById('m-hash');
+  h.style.display = h.style.display === 'none' ? 'block' : 'none';
+};
+
+function quickDownload(id) {
+  const it = ITEMS.find(x => x.id === id);
+  if (!it) return;
+  if (it.url && it.url !== '#') window.open(it.url, '_blank', 'noopener');
+  else toast('No direct download available');
+}
+
+/* ---------------- Search / sort / toggles ---------------- */
+document.getElementById('search').addEventListener('input', e => { state.search = e.target.value; render(); });
+document.getElementById('sort').addEventListener('change', e => { state.sort = e.target.value; render(); });
+document.getElementById('filterToggle').onclick = () => {
+  const s = document.getElementById('sidebar');
+  s.classList.toggle('open');
+};
+
+/* ---------------- Auth ---------------- */
+const authModal = document.getElementById('authModal');
+let authMode = 'login';
+function openAuth() { authModal.classList.add('open'); }
+function closeAuth() { authModal.classList.remove('open'); }
+document.getElementById('authOpen').onclick = openAuth;
+document.getElementById('authClose').onclick = closeAuth;
+authModal.addEventListener('click', e => { if (e.target === authModal) closeAuth(); });
+document.getElementById('tabLogin').onclick = () => { authMode = 'login'; document.getElementById('authName').style.display = 'none'; document.getElementById('authTitle').textContent = 'Sign in'; document.getElementById('authSubmit').textContent = 'Sign in'; };
+document.getElementById('tabRegister').onclick = () => { authMode = 'register'; document.getElementById('authName').style.display = 'block'; document.getElementById('authTitle').textContent = 'Create account'; document.getElementById('authSubmit').textContent = 'Create account'; };
+
+document.getElementById('authSubmit').onclick = async () => {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const displayName = document.getElementById('authName').value.trim();
+  const msg = document.getElementById('authMsg');
+  try {
+    const endpoint = authMode === 'login' ? '/auth/login' : '/auth/register';
+    const body = authMode === 'login' ? { email, password } : { email, password, displayName };
+    const res = await fetch(API_BASE + endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'failed');
+    AUTH_TOKEN = data.token;
+    localStorage.setItem('freehub_token', AUTH_TOKEN);
+    msg.textContent = 'Welcome, ' + (data.user.display_name || data.user.email) + '!';
+    msg.style.color = 'var(--accent-2)';
+    document.getElementById('authOpen').textContent = 'Account';
+    setTimeout(closeAuth, 900);
+  } catch (e) {
+    msg.textContent = e.message;
+    msg.style.color = 'var(--danger)';
+  }
+};
+
+let AUTH_TOKEN = localStorage.getItem('freehub_token') || null;
+
+// update auth button label on load
+if (AUTH_TOKEN) document.getElementById('authOpen').textContent = 'Account';
+
+/* ---------------- Submit content ---------------- */
+const submitModal = document.getElementById('submitModal');
+document.getElementById('submitOpen').onclick = () => submitModal.classList.add('open');
+document.getElementById('submitClose').onclick = () => submitModal.classList.remove('open');
+submitModal.addEventListener('click', e => { if (e.target === submitModal) submitModal.classList.remove('open'); });
+
+document.getElementById('submitBtn').onclick = async () => {
+  const msg = document.getElementById('submitMsg');
+  try {
+    const body = {
+      title: document.getElementById('subTitle').value.trim(),
+      url: document.getElementById('subUrl').value.trim(),
+      contentType: document.getElementById('subType').value,
+      license: document.getElementById('subLicense').value.trim(),
+      description: document.getElementById('subDesc').value.trim(),
+    };
+    if (!body.title || !body.url) throw new Error('title and url required');
+    const res = await fetch(API_BASE + '/submissions', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'failed');
+    msg.textContent = 'Submitted for review. Thank you!';
+    msg.style.color = 'var(--accent-2)';
+  } catch (e) {
+    msg.textContent = e.message;
+    msg.style.color = 'var(--danger)';
+  }
+};
+
+/* ---------------- Save item (in detail modal) ---------------- */
+// Add a save button handler: track via API when authed
+const saveBtn = document.createElement('button');
+saveBtn.className = 'btn btn-ghost btn-sm';
+saveBtn.textContent = '★ Save';
+saveBtn.style.marginLeft = 'auto';
+// insert into modal head
+document.querySelector('#modal .modal-head').appendChild(saveBtn);
+saveBtn.onclick = async () => {
+  if (!current) return;
+  if (!AUTH_TOKEN) { openAuth(); return; }
+  try {
+    await fetch(API_BASE + '/saved', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ contentId: current.id }),
+    });
+    toast('Saved to favorites');
+  } catch (e) { toast('Save failed'); }
+};
+
+/* ---------------- Toast ---------------- */
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const API_BASE = (window.FREEHUB_API || 'http://localhost:3001') + '/api';
+
+function authHeaders() {
+  return AUTH_TOKEN ? { Authorization: 'Bearer ' + AUTH_TOKEN } : {};
+}
+
+async function loadData() {
+  try {
+    const params = new URLSearchParams();
+    if (state.cat && state.cat !== 'all') params.set('type', state.cat === 'movies' ? 'movie' : state.cat === 'apps' ? 'app' : state.cat === 'assets' ? 'asset' : state.cat.slice(0, -1));
+    // keep simple: fetch all and filter client-side like before, but prefer API
+    const res = await fetch(API_BASE + '/content?limit=200', { headers: authHeaders() });
+    if (!res.ok) throw new Error('api ' + res.status);
+    const data = await res.json();
+    if (Array.isArray(data.items) && data.items.length) {
+      ITEMS = data.items.map(mapApiItem);
+      document.getElementById('demoBanner').style.display = 'none';
+      renderSubcatbar(); render();
+      return;
+    }
+  } catch (e) {
+    // API unavailable; fall back to mock data already in ITEMS
+    console.info('API unavailable, using built-in demo data:', e.message);
+    document.getElementById('demoBanner').style.display = 'block';
+  }
+  renderSubcatbar(); render();
+}
+
+function mapApiItem(it) {
+  const typeMap = { movie: 'movie', software: 'software', app: 'app', game: 'game', book: 'book', music: 'music', asset: 'asset' };
+  const type = typeMap[it.content_type] || it.content_type;
+  const catMap = { movie: 'movies', software: 'software', app: 'apps', game: 'games', book: 'books', music: 'music', asset: 'assets' };
+  return {
+    id: it.id,
+    title: it.title,
+    type,
+    cat: catMap[type] || 'software',
+    icon: type === 'movie' ? '🎬' : type === 'software' ? '📦' : type === 'app' ? '📱' : type === 'game' ? '🎮' : type === 'book' ? '📚' : type === 'music' ? '🎵' : '🎨',
+    license: it.license,
+    platform: (it.platform && it.platform[0]) || 'Web',
+    size: it.size_human || '—',
+    version: '—',
+    updated: it.updated_at ? String(it.updated_at).slice(0, 10) : '—',
+    source: '',
+    rating: Number(it.avg_rating) || 0,
+    reviews: 0,
+    downloads: Number(it.total_downloads) || 0,
+    risk: it.risk_overall || 'pending',
+    vt: '—',
+    signed: '—',
+    licclear: it.license_clear ? 'Yes' : 'Partial',
+    scanned: it.last_scanned ? String(it.last_scanned).slice(0, 10) : 'Never',
+    reports: it.user_reports || 0,
+    desc: it.description || '',
+    hash: '—',
+    url: it.download_url,
+    thumbnail: it.thumbnail_url || null,
+    tags: it.tags || [],
+  };
+}
+
+loadData();
+</script>
+</body>
+</html>

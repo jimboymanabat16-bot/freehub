@@ -1,0 +1,35 @@
+{
+  "name": "freehub-ingester",
+  "version": "1.0.0",
+  "description": "Ingestion pipeline for FreeHub: GitHub, F-Droid, Internet Archive, Steam, VirusTotal",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "ingest": "node src/index.js",
+    "ingest:github": "node src/index.js github",
+    "ingest:fdroid": "node src/index.js fdroid",
+    "ingest:archive": "node src/index.js archive",
+    "ingest:steam": "node src/index.js steam",
+    "ingest:itch": "node src/index.js itch",
+    "ingest:jamendo": "node src/index.js jamendo",
+    "ingest:gutenberg": "node src/index.js gutenberg",
+    "ingest:openlibrary": "node src/index.js openlibrary",
+    "ingest:polyhaven": "node src/index.js polyhaven",
+    "scan": "node src/index.js scan",
+    "health": "node src/index.js health",
+    "server": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "pg": "^8.13.0",
+    "meilisearch": "^0.44.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "helmet": "^8.0.0",
+    "express-rate-limit": "^7.4.0"
+  },
+  "engines": { "node": ">=20" }
+}
